@@ -105,7 +105,7 @@ setInterval(() => {
   addDataPoint(Date.now(), Math.random() * 50);
 }, 1000);
 setInterval(() => {
-  fetch('https://82.202.142.29:443')
+  fetch('https://felarn.fun')
     .then((resp) => resp.json())
     .then(doShit);
 }, 1000);
