@@ -3,8 +3,8 @@ console.log('script loaded');
 let chart = null;
 // Пример данных
 const doShit = (data) => {
-  const timeData = data.time; // Unix Epoch
-  const tempData = data.temp; // °C
+  const timeData = data.time;
+  const tempData = data.temp;
 
   // Конвертация времени в читаемый формат
   const formatDate = (timestamp) => {
@@ -25,7 +25,11 @@ const doShit = (data) => {
   chart = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: timeData.map(formatDate),
+      labels: timeData.map((timestamp) =>
+        new Date(timestamp).toLocaleString('ru-RU', {
+          timeZone: 'Europe/Moscow',
+        })
+      ),
       datasets: [
         {
           label: 'Температура (°C)',
