@@ -2,9 +2,12 @@ console.log('script loaded');
 
 let chart = null;
 // Пример данных
+
 const doShit = (data) => {
   const timeData = data.time;
   const tempData = data.temp;
+  const minTemp = Math.min(data.temp);
+  const maxTemp = Math.max(data.temp);
 
   // Конвертация времени в читаемый формат
   const formatDate = (timestamp) => {
@@ -69,8 +72,8 @@ const doShit = (data) => {
               weight: 'bold',
             },
           },
-          suggestedMin: Math.min(...tempData) - 2,
-          suggestedMax: Math.max(...tempData) + 2,
+          suggestedMin: minTemp - 2,
+          suggestedMax: maxTemp + 2,
         },
       },
       plugins: {
@@ -94,22 +97,11 @@ const doShit = (data) => {
   chart.update();
 };
 
-function addDataPoint(timestamp, temperature) {
-  // Добавляем новую точку в конец набора данных
-  chart.data.datasets[0].data.push({
-    x: timestamp,
-    y: temperature,
-  });
-
-  // Обновляем график с анимацией
-  chart.update();
-}
-
-setInterval(() => {
-  addDataPoint(Date.now(), Math.random() * 50);
-}, 1000);
-setInterval(() => {
+const refreshData = () => {
   fetch('https://felarn.fun')
     .then((resp) => resp.json())
-    .then(doShit);
-}, 1000);
+    .then(doShit)
+    .then(() => setTimeout(refreshData, 1000));
+};
+
+refreshData();
