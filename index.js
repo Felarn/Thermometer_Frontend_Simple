@@ -33,6 +33,8 @@ const decemate = (data) => {
     max: [],
     mean: [],
     latestUpadate: '',
+    absMin: 2000,
+    absMax: -273,
   };
   for (let i = 0; i < dataLen; i += step) {
     const slice = data.temp.slice(i, i + step);
@@ -44,6 +46,14 @@ const decemate = (data) => {
     );
     decematedData.min.push(Math.min(...slice));
     decematedData.latestUpadate = String(formatDateFull(data.time.at(-1)));
+    decematedData.absMax = Math.max(
+      decematedData.absMax,
+      decematedData.max.at(-1)
+    );
+    decematedData.absMin = Math.min(
+      decematedData.absMin,
+      decematedData.min.at(-1)
+    );
   }
 
   return decematedData;
@@ -58,8 +68,8 @@ const doShit = (data) => {
   const dataMean = data.mean;
   const dataMedian = data.median;
   const dataMax = data.max;
-  const minTemp = Math.min(data.temp) - 2;
-  const maxTemp = Math.max(data.temp) + 2;
+  const minTemp = data.absMin - 1;
+  const maxTemp = data.absMax + 1;
 
   // Создание графика
   const ctx = document.getElementById('tempChart').getContext('2d');
