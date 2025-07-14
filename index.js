@@ -6,11 +6,34 @@ const pointsTarget = 1000;
 
 const median = (arr) => arr.sort().at(Math.floor(arr.length / 2));
 
+// Конвертация времени в читаемый формат
+const formatDateShort = (timestamp) => {
+  const date = new Date(timestamp);
+  return date.toLocaleDateString('ru-RU', {
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
+const formatDateFull = (timestamp) =>
+  new Date(timestamp).toLocaleString('ru-RU', {
+    timeZone: 'Europe/Moscow',
+  });
+
 const decemate = (data) => {
   const dataLen = data.temp.length;
+  const pointsNumber = Math.min(dataLen, pointsTarget);
   console.log('DEC' + dataLen);
-  const step = Math.floor(dataLen / pointsTarget);
-  const decematedData = { time: [], min: [], median: [], max: [], mean: [] };
+  const step = Math.floor(dataLen / pointsNumber);
+  const decematedData = {
+    time: [],
+    min: [],
+    median: [],
+    max: [],
+    mean: [],
+    latestUpadate: '',
+  };
   for (let i = 0; i < dataLen; i += step) {
     const slice = data.temp.slice(i, i + step);
     decematedData.time.push(data.time.at(i));
@@ -20,6 +43,7 @@ const decemate = (data) => {
       slice.reduce((acc, item) => acc + item, 0) / slice.length
     );
     decematedData.min.push(Math.min(...slice));
+    decematedData.latestUpadate = String(formatDateFull(data.time.at(-1)));
   }
 
   return decematedData;
@@ -37,30 +61,17 @@ const doShit = (data) => {
   const minTemp = Math.min(data.temp) - 2;
   const maxTemp = Math.max(data.temp) + 2;
 
-  // Конвертация времени в читаемый формат
-  const formatDate = (timestamp) => {
-    const date = new Date(timestamp);
-    return date.toLocaleDateString('ru-RU', {
-      day: 'numeric',
-      month: 'short',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-
   // Создание графика
   const ctx = document.getElementById('tempChart').getContext('2d');
+  const textHeader = document.getElementById('textHeader');
+  textHeader.innerText = `Последние данные от: ${data.latestUpadate}`;
 
   if (chart) chart.destroy();
 
   chart = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: timeData.map((timestamp) =>
-        new Date(timestamp).toLocaleString('ru-RU', {
-          timeZone: 'Europe/Moscow',
-        })
-      ),
+      labels: timeData.map(formatDateShort),
       datasets: [
         {
           lineTension: 0,
@@ -141,7 +152,7 @@ const doShit = (data) => {
       plugins: {
         tooltip: {
           callbacks: {
-            title: (items) => formatDate(timeData[items[0].dataIndex]),
+            title: (items) => formatDateShort(timeData[items[0].dataIndex]),
             label: (context) => `Температура: ${context.parsed.y}°C`,
           },
         },
