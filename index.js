@@ -39,7 +39,7 @@ const doShit = (data) => {
 
   // Конвертация времени в читаемый формат
   const formatDate = (timestamp) => {
-    const date = new Date(timestamp * 1000);
+    const date = new Date(timestamp);
     return date.toLocaleDateString('ru-RU', {
       day: 'numeric',
       month: 'short',
