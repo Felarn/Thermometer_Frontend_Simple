@@ -32,6 +32,8 @@ const decemate = (data) => {
     median: [],
     max: [],
     mean: [],
+    restartTime: [], // Новое поле для времени перезапусков
+    restartCount: [], // Новое поле для счетчиков перезапусков
     latestUpadate: '',
     absMin: 2000,
     absMax: -273,
@@ -54,6 +56,13 @@ const decemate = (data) => {
       decematedData.absMin,
       decematedData.min.at(-1)
     );
+  }
+
+  // Добавляем данные о перезапусках
+  if (data.restartTime && data.restartCount) {
+    decematedData.restartTime = data.restartTime;
+    // decematedData.restartTime = new Date();
+    decematedData.restartCount = data.restartCount;
   }
 
   return decematedData;
@@ -127,6 +136,20 @@ const doShit = (data) => {
           fill: '-1',
           tension: 0,
         },
+        {
+          type: 'scatter', // Тип графика - точечный
+          label: 'Перезапуски',
+          data: data.restartTime.map((time, index) => ({
+            x: formatDateShort(time), // Время перезапуска
+            y: 28, // Счетчик перезапусков
+            // y: data.restartCount[index], // Счетчик перезапусков
+          })),
+          borderColor: 'rgba(153, 102, 255, 1)', // Цвет границы точек
+          backgroundColor: 'rgba(153, 102, 255, 0.5)', // Цвет заливки точек
+          pointRadius: 5, // Размер точек
+          pointHoverRadius: 7, // Размер при наведении
+          showLine: false, // Не соединять точки линиями
+        },
       ],
     },
     options: {
@@ -188,7 +211,7 @@ const refreshData = () => {
     // )
     .then(decemate)
     .then(doShit)
-    .then(() => setTimeout(refreshData, 1000));
+    .then(() => setTimeout(refreshData, 30000));
 };
 
 refreshData();
